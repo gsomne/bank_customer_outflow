@@ -1,8 +1,10 @@
 def main():
-	hui()
+	say_hi()
 
-def hui():
-	print('хуй')
+
+def say_hi():
+	print('Іди нахуй')
+
 
 if __name__ == "__main__":
-	 main()
+	main()
