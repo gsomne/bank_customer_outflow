@@ -36,9 +36,9 @@ def main():
                 (666, 'France', 'Male', 32, 4, 123000.0, 2, 1, 1, 89321.75),
                 (666, 'Germany', 'Male', 32, 4, 123000.0, 2, 1, 1, 89321.75)]
         test.append(tur)
-        with open('../../Desktop/bank_customer_outflow-main/output.csv', 'w', newline='') as f:
+        with open('output.csv', 'w', newline='') as f:
             csv.writer(f).writerows(test)
-        dt = pd.read_csv('../../Desktop/bank_customer_outflow-main/output.csv')
+        dt = pd.read_csv('output.csv')
         T = dt.iloc[:, 0:10].values
         label_T_country_encoder = LabelEncoder()
         T[:, 1] = label_T_country_encoder.fit_transform(T[:, 1])
@@ -67,10 +67,18 @@ def main():
                                        max_features=None, max_leaf_nodes=10, min_impurity_decrease=0.0,
                                        class_weight=None)
         dtree.fit(X_train, y_train)
+        sr = rf.predict(T)[3] + dtree.predict(T)[3] + pac.predict(T)[3] + mlp_clf.predict(T)[3]
+        if sr / 4 > 0.5:
+            res_["text"] = 'Вероятно уйдет'
+        elif sr / 4 < 0.5:
+            res_["text"] = 'Вероятно не уйдет'
+        else:
+            res_["text"] = 'Нельзя сказать точно'
         f_["text"] = f'forest predict {rf.predict(T)[3]}'
         t_["text"] = f'tree predict {dtree.predict(T)[3]}'
         p_["text"] = f'pac predict {pac.predict(T)[3]}'
         m_["text"] = f'mlpc predict {mlp_clf.predict(T)[3]}'
+
         print('Run successfully')
 
 
@@ -80,59 +88,74 @@ def main():
 
     # root['bg'] = '#fafafa'
     root.title('Bank customer outflow')
-    root.geometry('600x550')
+    root.geometry('400x700')
 
-    canvas = Canvas(root, height=3000, width=2500)
+    canvas = Canvas(root, height=3500, width=2500)
     canvas.pack()
 
     # frame = Frame(root, bg='red')
     # frame.place(relx=0.15, rely=0.15, relwidth=0.7, relheight=0.7)
 
-    res_forest = ttk.Label(canvas, text=forest(), font=40)
+    res_forest = ttk.Label(canvas, text=forest())
     res_forest.pack()
-    res_tree = ttk.Label(canvas, text=tree(), font=40)
+    res_tree = ttk.Label(canvas, text=tree())
     res_tree.pack()
-    res_pac = ttk.Label(canvas, text=pac_(), font=40)
+    res_pac = ttk.Label(canvas, text=pac_())
     res_pac.pack()
-    res_mlpc = ttk.Label(canvas, text=mlpc_(), font=40)
+    res_mlpc = ttk.Label(canvas, text=mlpc_())
     res_mlpc.pack()
 
-    e_cs = ttk.Entry()
+    ttk.Label(canvas, text='Кредитный рейтинг').pack()
+    e_cs = ttk.Entry(canvas)
     e_cs.pack()
-    e_geo = ttk.Entry()
+    ttk.Label(canvas, text='Страна').pack()
+    e_geo = ttk.Entry(canvas)
     e_geo.pack()
-    e_gen = ttk.Entry()
+    ttk.Label(canvas, text='Пол').pack()
+    e_gen = ttk.Entry(canvas)
     e_gen.pack()
-    e_age = ttk.Entry()
+    ttk.Label(canvas, text='Возраст').pack()
+    e_age = ttk.Entry(canvas)
     e_age.pack()
-    e_ten = ttk.Entry()
+    ttk.Label(canvas, text='Сколько лет клиент').pack()
+    e_ten = ttk.Entry(canvas)
     e_ten.pack()
-    e_bal = ttk.Entry()
+    ttk.Label(canvas, text='Баланс').pack()
+    e_bal = ttk.Entry(canvas)
     e_bal.pack()
-    e_nop = ttk.Entry()
+    ttk.Label(canvas, text='Кол-во продуктов').pack()
+    e_nop = ttk.Entry(canvas)
     e_nop.pack()
-    e_cc = ttk.Entry()
+    ttk.Label(canvas, text='Есть ли кредитная карта').pack()
+    e_cc = ttk.Entry(canvas)
     e_cc.pack()
-    e_act = ttk.Entry()
+    ttk.Label(canvas, text='Активный ли пользователь').pack()
+    e_act = ttk.Entry(canvas)
     e_act.pack()
-    e_sal = ttk.Entry()
+    ttk.Label(canvas, text='Зарплата').pack()
+    e_sal = ttk.Entry(canvas)
     e_sal.pack()
 
     btn = ttk.Button(canvas, text='Предсказать', command=show_message)
     btn.pack()
 
-    f_ = ttk.Label()
+    f_ = ttk.Label(canvas)
     f_.pack()
-    t_ = ttk.Label()
+    t_ = ttk.Label(canvas)
     t_.pack()
-    p_ = ttk.Label()
+    p_ = ttk.Label(canvas)
     p_.pack()
-    m_ = ttk.Label()
+    m_ = ttk.Label(canvas)
     m_.pack()
+    res_ = ttk.Label(canvas)
+    res_.pack()
+
+
+
     root.mainloop()
 
 def read_data():
-    data = pd.read_csv(r'../../Desktop/bank_customer_outflow-main/Churn_Modelling.csv')
+    data = pd.read_csv(r'Churn_Modelling.csv')
     data = data.drop(['RowNumber', 'CustomerId', 'Surname'], axis=1)
 
     X = data.iloc[:, 0:10].values
